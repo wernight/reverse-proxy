@@ -19,9 +19,9 @@ Supposing that `my-app.my-domain.com` points to your machine's IP, now going ope
 
 ### Using with Docker
 
-This is really useful for **[Docker](http://www.docker.com/)** (with or without [docker-compose](http://blog.docker.com/tag/docker-compose/).
+This is really useful for **[Docker](http://www.docker.com/)** (with or without [docker-compose](http://blog.docker.com/tag/docker-compose/), previously [Fig](http://fig.sh)).
 
-Supposing you've a `docker-compose.yml` that looks somewhat like (not this will use a random port):
+Supposing you've a `docker-compose.yml` that looks somewhat like (not this will use a *random* port):
 
     web:
       build: .
@@ -32,3 +32,5 @@ Now you can make your server serve it via:
 
     $ docker-compose up -d
     $ reverse-proxy add myapp.example.com $(docker-compose port web 80)
+
+Now http://myapp.example.com points to your Dockerized website.
