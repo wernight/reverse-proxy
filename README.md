@@ -35,4 +35,4 @@ Now you can make your server serve it via:
 
 ## See Also
 
- * [Dokku](https://github.com/progrium/dokku) - Small PaaS implementation of Heroku-like applications. Lots comes from it. Unlike it, `reverse-proxy` only handles the reverse proxying which allows you to run any type of containers or service behind (not just [Buildpack](https://devcenter.heroku.com/articles/buildpacks)).
+ * [Dokku](https://github.com/progrium/dokku) - Small PaaS implementation for Heroku-like applications. Lots comes from it. Unlike it, `reverse-proxy` only handles the reverse proxying which allows you to run any type of containers or service behind (not just [Buildpack](https://devcenter.heroku.com/articles/buildpacks)).
