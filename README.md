@@ -32,5 +32,3 @@ Now you can make your server serve it via:
 
     $ docker-compose up -d
     $ reverse-proxy add myapp.example.com $(docker-compose port web 80)
-
-Now http://myapp.example.com points to your Dockerized website.
