@@ -118,7 +118,7 @@ case "$1" in
     install
     ;;
 
-  unsintall)
+  uninstall)
     uninstall
     ;;
 
