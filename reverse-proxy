@@ -1,0 +1,156 @@
+#!/bin/bash -e
+
+APPS_ROOT=$(pwd)/apps
+
+restart_nginx () {
+  sudo /etc/init.d/nginx reload > /dev/null
+}
+
+help () {
+    echo "Setups virtual host reverse proxies on a Linux machine."
+    echo "So that your-app.your-domain.com links whatever local port you gave."
+    echo "Once installed, non-root users will be able to add or update"
+    echo "subdomain reverse proxies."
+    echo ""
+    echo "Commands:"
+    echo "  install"
+    echo "      Install or upgrade this script; must be executed once"
+    echo "      by the user later adding virtual hosts (requires root)."
+    echo "  uninstall"
+    echo "      Removes everything done by 'install' (requires root)."
+    echo "  add <hostname> <port>"
+    echo "      Creates or update a reverse proxy so that the full domain name"
+    echo "      <hostname> points to localhost:<port>."
+    echo "  rm <hostname>"
+    echo "      Removes a virtual host setup by 'add'"
+    echo "  ls"
+    echo "      Lists all currently set up subdomains."
+}
+
+install () {
+    echo "Install"
+    echo "       Create directory structure..."
+    mkdir -p $APPS_ROOT
+
+    echo "       Set up Nginx..."
+    if [ ! -d /etc/nginx ]
+    then
+      echo "Please install Nginx first, usually:"
+      echo "  \$ apt-get install nginx"
+      exit 1
+    fi
+    echo "include $APPS_ROOT/*/nginx.conf;" > /etc/nginx/conf.d/reverse-proxy.conf
+
+    echo "       Allow current user to run nginx reload without being root..."
+    echo "$USER ALL=(ALL) NOPASSWD:/etc/init.d/nginx reload" >> /etc/sudoers.d/reverse-proxy-nginx
+    chmod 0440 /etc/sudoers.d/reverse-proxy-nginx
+
+    echo ""
+    echo "Install complete for $USER."
+    echo "You may now run 'add' to set up a virtual host reverse proxy."
+}
+
+uninstall () {
+    rm -f /etc/nginx/conf.d/reverse-proxy.conf
+    rm -f /etc/sudoers.d/reverse-proxy-nginx
+}
+
+check_installed () {
+    if [ ! -d $APPS_ROOT ]
+    then
+      echo "You must first run the 'install' command once as root/sudoer."
+      exit 1
+    fi
+}
+
+add () {
+    FULL_HOSTNAME=$1
+    PORT=$2  # In the form IP:PORT
+
+    echo "Set up $FULL_HOSTNAME --> 127.0.0.1:$PORT"
+
+    echo "       Generate configuration for this reverse proxy..."
+    mkdir -p $APPS_ROOT/$FULL_HOSTNAME
+    cat<<EOF > $APPS_ROOT/$FULL_HOSTNAME/nginx.conf
+server {
+  listen      [::]:80;
+  listen      80;
+  server_name $FULL_HOSTNAME;
+  location    / {
+    proxy_pass  http://127.0.0.1:$PORT;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade \$http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host \$http_host;
+    proxy_set_header X-Forwarded-Proto \$scheme;
+    proxy_set_header X-Forwarded-For \$remote_addr;
+    proxy_set_header X-Forwarded-Port \$server_port;
+    proxy_set_header X-Request-Start \$msec;
+  }
+}
+EOF
+
+    echo "       Reloading nginx"
+    restart_nginx
+}
+
+remove () {
+    FULL_HOSTNAME=$2
+
+    echo "Remove $FULL_HOSTNAME"
+    rm -rf $APPS_ROOT/$FULL_HOSTNAME
+
+    echo "       Reloading nginx"
+    restart_nginx
+}
+
+list () {
+    # TODO: Show port for each.
+    ls -1 $APPS_ROOT
+}
+
+case "$1" in
+  help)
+    help
+    ;;
+
+  install)
+    install
+    ;;
+
+  unsintall)
+    uninstall
+    ;;
+
+  add)
+    check_installed
+    add $2 $3
+    ;;
+
+  remove)
+    check_installed
+    remove $2
+    ;;
+
+  rm)
+    check_installed
+    remove $2
+    ;;
+
+  list)
+    check_installed
+    list
+    ;;
+
+  ls)
+    check_installed
+    list
+    ;;
+
+  *)
+    echo "Unknown command: $1"
+    echo ""
+    help
+    exit 1
+    ;;
+esac
