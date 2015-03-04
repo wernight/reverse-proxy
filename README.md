@@ -7,7 +7,7 @@ Setups virtual host reverse proxies on a Linux machine so that *your-app.your-do
 
  1. From a Debian machine (e.g., Ubuntu)
  2. Install Nginx: `$ sudo apt-get install nginx`
- 3. `$ sudo reverse-proxy install`
+ 3. Download/clone reverse-proxy script and run `$ sudo reverse-proxy install`
 
 You can *uninstall* later via `$ sudo reverse-proxy uninstall`.
 
