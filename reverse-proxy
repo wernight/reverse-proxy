@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
-APPS_ROOT=$(pwd)/apps
+DIR=$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )
+APPS_ROOT=$DIR/apps
 
 restart_nginx () {
   sudo /etc/init.d/nginx reload > /dev/null
