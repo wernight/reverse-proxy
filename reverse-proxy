@@ -14,9 +14,9 @@ help () {
     echo "subdomain reverse proxies."
     echo ""
     echo "Commands:"
-    echo "  install"
-    echo "      Install or upgrade this script; must be executed once"
-    echo "      by the user later adding virtual hosts (requires root)."
+    echo "  install [<user>]"
+    echo "      Install or upgrade this script; must be executed once with <user>"
+    echo "      being the user later adding virtual hosts (requires root)."
     echo "  uninstall"
     echo "      Removes everything done by 'install' (requires root)."
     echo "  add <hostname> <target>"
@@ -30,7 +30,12 @@ help () {
 }
 
 install () {
-    echo "Install"
+    FOR_USER=$1
+    if [ -z "$FOR_USER" ]
+    then
+      FOR_USER=$USER
+    fi
+    echo "Install for $FOR_USER"
     echo "       Create directory structure..."
     mkdir -p $APPS_ROOT
 
@@ -44,11 +49,11 @@ install () {
     echo "include $APPS_ROOT/*/nginx.conf;" > /etc/nginx/conf.d/reverse-proxy.conf
 
     echo "       Allow current user to run nginx reload without being root..."
-    echo "$USER ALL=(ALL) NOPASSWD:/etc/init.d/nginx reload" >> /etc/sudoers.d/reverse-proxy-nginx
+    echo "$FOR_USER ALL=(ALL) NOPASSWD:/etc/init.d/nginx reload" >> /etc/sudoers.d/reverse-proxy-nginx
     chmod 0440 /etc/sudoers.d/reverse-proxy-nginx
 
     echo ""
-    echo "Install complete for $USER."
+    echo "Install complete for $FOR_USER."
     echo "You may now run 'add' to set up a virtual host reverse proxy."
 }
 
