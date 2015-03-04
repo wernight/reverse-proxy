@@ -9,11 +9,11 @@ Setups virtual host reverse proxies on a Linux machine so that *your-app.your-do
  2. Install Nginx: `$ sudo apt-get install nginx`
  3. `$ sudo reverse-proxy install`
 
-You can *uninstall* via `$ sudo reverse-proxy uninstall`.
+You can *uninstall* later via `$ sudo reverse-proxy uninstall`.
 
 ### Setting up or updating a reverse proxy
 
-    $ reverse-proxy add my-app.my-domain.com 8080
+    $ reverse-proxy add my-app.my-domain.com 127.0.0.1:8080
     
 Supposing that `my-app.my-domain.com` points to your machine's IP, now going opening `http://my-app.my-domain.com` in your browser will try to connect to `127.0.0.1:8080` on your machine.
 
