@@ -65,9 +65,9 @@ check_installed () {
 
 add () {
     FULL_HOSTNAME=$1
-    PORT=$2  # In the form IP:PORT
+    TARGET=$2
 
-    echo "Set up $FULL_HOSTNAME --> 127.0.0.1:$PORT"
+    echo "Set up $FULL_HOSTNAME --> $TARGET"
 
     echo "       Generate configuration for this reverse proxy..."
     mkdir -p $APPS_ROOT/$FULL_HOSTNAME
@@ -77,7 +77,7 @@ server {
   listen      80;
   server_name $FULL_HOSTNAME;
   location    / {
-    proxy_pass  http://127.0.0.1:$PORT;
+    proxy_pass  http://$TARGET;
     proxy_http_version 1.1;
     proxy_set_header Upgrade \$http_upgrade;
     proxy_set_header Connection "upgrade";
